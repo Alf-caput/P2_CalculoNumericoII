@@ -22,14 +22,18 @@ function res = perteneceCiclo(A, arista)
 
     [fil, col] = size(A);
     % La matriz de adyacencia debe ser cuadrada y simétrica
-    if ~(fil == col && isequal(A, A'))
+    if ~(fil == col ...
+        && isequal(A, A'))
         disp('Error: Matriz de adyacencia no válida');
         res = false;
         return
     end
 
     % La arista debe tener dos componentes enteras distintas que toman valores entre 1 y el número de nodos
-    if ~(length(arista) == 2 && all(arista == round(arista)) && arista(1) ~= arista(2) && all(arista >= 1 & arista <= fil))
+    if ~(length(arista) == 2 ...
+        && all(arista == round(arista)) ...
+        && arista(1) ~= arista(2) ...
+        && all(arista >= 1 & arista <= fil))
         disp('Error: Arista no válida');
         res = false;
         return
