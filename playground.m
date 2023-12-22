@@ -12,29 +12,31 @@ G = graph(A);
 figure
 plot(G)
 
-arista = [3, 4];
+arista = [3, 5];
 
 res = perteneceCiclo(A, arista);
 
 disp(res);
 
-
 function res = perteneceCiclo(A, arista)
-
+    % Dimensiones matriz de adyacencia
     [fil, col] = size(A);
-    % La matriz de adyacencia debe ser cuadrada y simétrica
-    if ~(fil == col ...
-        && isequal(A, A'))
+
+    % Matriz de adyacencia debe ser:
+    if ~(fil == col ... % Cuadrada
+        && isequal(A, A')) % Simétrica
+
         disp('Error: Matriz de adyacencia no válida');
         res = false;
         return
     end
 
-    % La arista debe tener dos componentes enteras distintas que toman valores entre 1 y el número de nodos
-    if ~(length(arista) == 2 ...
-        && all(arista == round(arista)) ...
-        && arista(1) ~= arista(2) ...
-        && all(arista >= 1 & arista <= fil))
+    % La arista debe tener:
+    if ~(length(arista) == 2 ... % Dos componentes
+        && all(arista == round(arista)) ... % Valores enteros
+        && arista(1) ~= arista(2) ... % No ciclos propios
+        && all(arista >= 1 & arista <= fil)) % Valores entre 1 y nº de aristas
+
         disp('Error: Arista no válida');
         res = false;
         return
@@ -47,29 +49,41 @@ function res = perteneceCiclo(A, arista)
     vistos = zeros(1, fil);
     vistos(arista(1)) = 1;
 
-    % La arista pertenece a un ciclo si se puede ir de uno de sus extremos al otro tras eliminarla del grafo inicial 
+    % Si se puede ir de uno de sus extremos al otro tras eliminarla del grafo inicial
+    % Entonces la arista pertenece a un ciclo 
     res = dfs(A, arista(1), arista(2), vistos);
 end
 
-function res = dfs(grafo, actual, objetivo, vistos)
+function pertenece = dfs(grafo, actual, objetivo, vistos)
+    % Vecinos al nodo actual
     vecinos = grafo(actual, :);
+
+    % Nos interesan los nodos no visitados
+    % Le restamos a los vecinos los que ya hemos visitado
     vecinos_no_visitados = find(vecinos - (vecinos & vistos));
-    
     figure
     plot(graph(grafo))
-
+    
     for i = 1:length(vecinos_no_visitados)
+        % Se añade el visitado a los vistos
         vistos(vecinos_no_visitados(i)) = 1;
-        if ismember(objetivo, vistos)
-            res = true;
+
+        % Si el objetivo se encuentra en los vistos terminamos
+        if ismember(objetivo, find(vistos))
+            pertenece = true;
             break
         end
-        if vecinos_no_visitados(i) == objetivo
-            break
-        end
+
+        % Eliminamos la arista que hemos utilizado para visitar
         arista = [actual, vecinos_no_visitados(i)];
         grafo(arista, flip(arista)) = 0;
-        dfs(grafo, vecinos_no_visitados(i), objetivo, vistos);
-        res = false;
+
+        % Por recursión se siguen visitando
+        pertenece = dfs(grafo, vecinos_no_visitados(i), objetivo, vistos);
+        
+        % Permitimos volver hacia atrás en la recursión si pertenece
+        if pertenece
+            break
+        end
     end
 end
