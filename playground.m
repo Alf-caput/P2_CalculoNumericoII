@@ -9,8 +9,9 @@ A = [
 ];
 
 G = graph(A);
+figure
 plot(G)
-hold off
+
 arista = [3, 4];
 
 res = perteneceCiclo(A, arista);
@@ -54,8 +55,9 @@ function res = dfs(grafo, actual, objetivo, vistos)
     vecinos = grafo(actual, :);
     vecinos_no_visitados = find(vecinos - (vecinos & vistos));
     
+    figure
     plot(graph(grafo))
-    hold off
+
     for i = 1:length(vecinos_no_visitados)
         vistos(vecinos_no_visitados(i)) = 1;
         if ismember(objetivo, vistos)
