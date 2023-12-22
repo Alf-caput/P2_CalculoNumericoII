@@ -1,3 +1,5 @@
+clear, clc, clf
+
 A = [
     0, 1, 0, 0, 1;
     1, 0, 1, 0, 0;
@@ -8,6 +10,7 @@ A = [
 
 G = graph(A);
 plot(G)
+hold off
 arista = [3, 4];
 
 res = perteneceCiclo(A, arista);
@@ -44,21 +47,23 @@ function res = perteneceCiclo(A, arista)
 end
 
 function res = dfs(grafo, actual, objetivo, vistos)
-    vecinos = find(grafo(actual, :));
-
-    for i = 1:length(vecinos)
-        vistos(vecinos(i)) = 1;
-        if vecinos(i) == objetivo
-            break
-        end
+    vecinos = grafo(actual, :);
+    vecinos_no_visitados = find(vecinos - (vecinos & vistos));
+    
+    plot(graph(grafo))
+    hold off
+    for i = 1:length(vecinos_no_visitados)
+        vistos(vecinos_no_visitados(i)) = 1;
         if ismember(objetivo, vistos)
             res = true;
             break
         end
-        arista = [actual, vecinos(i)];
+        if vecinos_no_visitados(i) == objetivo
+            break
+        end
+        arista = [actual, vecinos_no_visitados(i)];
         grafo(arista, flip(arista)) = 0;
-        dfs(grafo, vecinos(i), objetivo, vistos)
+        dfs(grafo, vecinos_no_visitados(i), objetivo, vistos);
         res = false;
     end
-
 end
