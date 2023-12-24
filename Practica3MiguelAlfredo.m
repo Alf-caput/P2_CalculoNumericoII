@@ -124,11 +124,9 @@ A = logical(W);
 G = graph(W);
 figure
 plot(G, EdgeLabel=G.Edges.Weight)
-
-S = kruskal(A, W);
-GS = graph(S);
-figure
-plot(GS, EdgeLabel=GS.Edges.Weight)
+% C = W == min(W)
+%S = kruskal(A, W)
+pesos = unique(W(W~=0))
 %% Funciones
 
 function res = perteneceCiclo(A, arista)
@@ -195,7 +193,7 @@ function [pertenece_comp_conexa, visitados] = dfs(grafo, actual, objetivo, visit
     % (En el caso de no especificar la variable "visitados")
     if nargin < 4
         % Se especifica el vector de nodos visitados
-        num_nodos = size(grafo, 1);
+        num_nodos = size(A, 1);
         visitados = zeros(1, num_nodos);
     end
 
@@ -276,29 +274,8 @@ function S = kruskal(A, W)
         return
     end
 
-    % Se irán añadiendo aristas a S hasta que el grafo sea conexo
-    % Se evitarán ciclos
-    num_nodos = fil;
-    S = zeros(num_nodos);
-    pesos = unique(W(W~=0));
-    % Por ser la matriz simétrica solo necesito trabajar con la mitad
-    aux = triu(W);
-    for i = 1:length(pesos)
-        [fil, col] = find(aux == pesos(i));
-        aristas = [fil; col];
-        for j = 1:length(aristas)
-            
-            if esConexo(S)
-                return
-            end
-
-            if perteneceCiclo(S, arista(i))
-                continue
-            end
-
-            S(arista(i), flip(arista(i))) = pesos(i);
-            
-        end
-    end
+    % Creo una matriz kx2 que lleva por filas las aristas
+    % Ordenadas por su peso
+    pesos = unique(W(W~=0))
 
 end
