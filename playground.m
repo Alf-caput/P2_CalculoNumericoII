@@ -54,22 +54,22 @@ function res = perteneceCiclo(A, arista)
     res = dfs(A, arista(1), arista(2), vistos);
 end
 
-function pertenece = dfs(grafo, actual, objetivo, vistos)
+function pertenece = dfs(grafo, actual, objetivo, visitados)
     % Vecinos al nodo actual
     vecinos = grafo(actual, :);
 
     % Nos interesan los nodos no visitados
     % Le restamos a los vecinos los que ya hemos visitado
-    vecinos_no_visitados = find(vecinos - (vecinos & vistos));
+    vecinos_no_visitados = find(vecinos - (vecinos & visitados));
     figure
     plot(graph(grafo))
     
     for i = 1:length(vecinos_no_visitados)
         % Se añade el visitado a los vistos
-        vistos(vecinos_no_visitados(i)) = 1;
+        visitados(vecinos_no_visitados(i)) = 1;
 
         % Si el objetivo se encuentra en los vistos terminamos
-        if ismember(objetivo, find(vistos))
+        if ismember(objetivo, find(visitados))
             pertenece = true;
             break
         end
@@ -79,7 +79,7 @@ function pertenece = dfs(grafo, actual, objetivo, vistos)
         grafo(arista, flip(arista)) = 0;
 
         % Por recursión se siguen visitando
-        pertenece = dfs(grafo, vecinos_no_visitados(i), objetivo, vistos);
+        pertenece = dfs(grafo, vecinos_no_visitados(i), objetivo, visitados);
         
         % Permitimos volver hacia atrás en la recursión si pertenece
         if pertenece
