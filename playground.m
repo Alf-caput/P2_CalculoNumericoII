@@ -292,11 +292,11 @@ function S = kruskal(A, W)
                 return
             end
 
-            if perteneceCiclo(S, arista(i))
+            if perteneceCiclo(S, aristas(j))
                 continue
             end
 
-            S(arista(i), flip(arista(i))) = pesos(i);
+            S(aristas(j), flip(aristas(j))) = pesos(i);
             
         end
     end
