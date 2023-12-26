@@ -2,9 +2,7 @@
 % Equipo: Miguel Egido Morales y Alfredo Robledano Abasolo
 % 
 % Grupo: 3ºB
-%% 
-% 
-% 
+%% *Introducción*
 % El objetivo de esta práctica es programar el algoritmo de Kruskal mediante 
 % un código de tipo function. Para ello subdividiremos el problema en problemas 
 % más pequeños. Para ello recuerda que el objetivo es encontrar un subgrafo *CONEXO* 
@@ -17,13 +15,16 @@
 % $A=Ad(G)$.
 %% *Problema 1*
 % Crea un código del tipo function cuyos inputs sean la matriz de adyacencia 
-% de un grafo $G$ y un vértice $e=\{i,j\}\in E(G)$ (el cual se puede representar 
+% de un grafo $G$ y un vértice $v=\{i,j\}\in E(G)$ (el cual se puede representar 
 % por la entrada $(i,j)=(j,i)$ de la matriz $A$) y sus outputs sean un array de 
 % carácteres especificando si dicha arista pertenecía a un ciclo (no trivial) 
 % o no. Nótese que si no existe dicha arista debe dar el mensaje de error correspondiente 
 % y que si $A=Ad(G)$ no es una matriz correspondiente a una de adyancencia debe 
 % dar error también.
 % Respuesta 1
+% En la última sección de este documento se define y detalla el funcionamiento 
+% de la función perteneceCiclo(), función que permite comprobar si una arista 
+% de un grafo pertenece a un ciclo. A continuación se presenta un ejemplo de uso:
 
 clear, clc, clf
 
@@ -34,6 +35,8 @@ A = [
     0, 0, 1, 0, 0;
     1, 0, 1, 0, 0;
 ];
+%% 
+% Grafo G:
 
 G = graph(A);
 figure
@@ -42,13 +45,25 @@ plot(G)
 arista = [3, 5];
 
 res = perteneceCiclo(A, arista);
-
 disp(res);
+%% 
+% Como output de este bloque de código imprimimos una cadena de caracteres que 
+% nos permite comprobar el resultado:
+
+if res
+    cadena = "La arista pertenece a un ciclo";
+else
+    cadena = "La arista no pertenece a un ciclo";
+end
+disp(cadena)
 %% *Problema 2*
 % Crea un código del tipo function cuyos inputs sean la matriz de adyacencia 
 % de un grafo $G$ y sus outputs sean un array de carácteres indicando si el grafo 
 % es conexo o no.
 % Respuesta 2
+% En la última sección de este documento se define y detalla el funcionamiento 
+% de la función esConexo(), función que permite comprobar si un grafo es conexo. 
+% A continuación se presentan dos ejemplos de uso:
 
 clear, clc, clf
 % Ejemplo conexo
@@ -64,14 +79,15 @@ A = [
     0 0 0 0 0 0 0 1 0 1;
     1 0 0 0 0 0 0 0 1 0;
 ];
-
+%% 
+% Grafo G:
 
 G = graph(A);
 figure
 plot(G)
 
-resultado = esConexo(A);
-disp(resultado);
+res = esConexo(A);
+disp(res);
 
 % ejemplo no conexo
 B = [
@@ -86,8 +102,18 @@ B = [
     0 0 0 0 0 0 0 1 0 1;
     0 0 0 0 0 0 0 0 1 0;
 ];
+%% 
+% Como output de este bloque de código imprimimos una cadena de caracteres que 
+% nos permite comprobar el resultado:
 
-
+if res
+    cadena = "El grafo es conexo";
+else
+    cadena = "El grafo no es conexo";
+end
+disp(cadena)
+%% 
+% Grafo P:
 
 P = graph(B);
 figure
@@ -95,6 +121,16 @@ plot(P)
 
 res = esConexo(B);
 disp(res);
+%% 
+% Como output de este bloque de código imprimimos una cadena de caracteres que 
+% nos permite comprobar el resultado:
+
+if res
+    cadena = "El grafo es conexo";
+else
+    cadena = "El grafo no es conexo";
+end
+disp(cadena)
 %% *Problema 3*
 % Crea un código del tipo function cuyos inputs sean la matriz de adyacencia 
 % de un grafo $G$ y la matriz $\Omega(G)$ de pesos de $G$ y sus outputs sean o 
@@ -108,6 +144,10 @@ disp(res);
 % ordenadas por peso. Nótese que los elementos de esta matriz son matrices $1\times 
 % 2$.
 % Respuesta 3
+% En la última sección de este documento se define y detalla el funcionamiento 
+% de la función kruskal(), función que permite obtener uno de los posibles árboles 
+% de expansión mínima para un grafo dado. A continuación se presenta un ejemplo 
+% de uso:
 
 % Matriz de pesos
 W = [
@@ -120,16 +160,28 @@ W = [
 
 % Matriz de adyacencia
 A = logical(W);
+%% 
+% Grafo inicial G:
 
 G = graph(W);
 figure
 plot(G, EdgeLabel=G.Edges.Weight)
+%% 
+% Árbol de expansión mínima final S:
 
 S = kruskal(A, W);
 GS = graph(S);
 figure
 plot(GS, EdgeLabel=GS.Edges.Weight)
 %% Funciones
+% perteneceCiclo
+% La función perteneceCiclo() permite comprobar si una arista pertenece a un 
+% ciclo. Recibe como entradas la matriz de adyacencia y la arista que se quieren 
+% estudiar. Como salida devuelve un valor booleano que indica la pertenecia o 
+% no a un ciclo. El método utilizado es el algoritmo de búsqueda por profundidad. 
+% Se inicia la exploración desde un extremo de la arista (arbitrariamente primera 
+% componente) hasta que encuentre el otro extremo (segunda componente). En caso 
+% de no encontrarlo diremos que no pertenece y en caso afirmativo que si pertenece.
 
 function res = perteneceCiclo(A, arista)
     % Dimensiones matriz de adyacencia
@@ -138,31 +190,29 @@ function res = perteneceCiclo(A, arista)
     % Matriz de adyacencia debe ser:
     if ~(fil == col ... % Cuadrada
         && isequal(A, A')) % Simétrica
-
-        disp('Error: Matriz de adyacencia no válida');
-        res = -1;
-        return
+        error('Error: Matriz de adyacencia no válida');
     end
 
     % La arista debe tener:
     if ~(length(arista) == 2 ... % Dos componentes
         && all(arista == round(arista)) ... % Valores enteros
         && arista(1) ~= arista(2) ... % No ciclos propios
+        && A(arista(1), arista(2)) ~= 0 ... % La arista pertenece al grafo
         && all(arista >= 1 & arista <= num_nodos)) % Valores entre 1 y nº de aristas
-
-        disp('Error: Arista no válida');
-        res = -1;
-        return
+        error('Error: Arista no válida');
     end
-    
-    % Se elimina la arista que queremos comprobar
-    A(arista, flip(arista)) = 0;
 
     % Si se puede ir de uno de sus extremos al otro tras eliminarla del grafo inicial
     % Entonces la arista pertenece a un ciclo 
     [res, ~] = dfs(A, arista(1), arista(2));
 end
-
+% esConexo
+% La función esConexo() permite comprobar si un ciclo es conexo. Recibe como 
+% entrada la matriz de adyacencia del grafo que se quiere estudiar. Como salida 
+% devuelve un valor booleano que indica la conectividad o no del grafo. El método 
+% utilizado es el algoritmo de búsqueda por profundidad. Se inicia la exploración 
+% arbitrariamente desde el primer nodo (actual=1) y si no es capaz de visitar 
+% todos los nodos entonces diremos que no es conexo.
 
 function res = esConexo(A)
 % Esta funcion comprueba si e grafo es conexo o no
@@ -170,10 +220,7 @@ function res = esConexo(A)
     % Matriz de adyacencia debe ser:
     if ~(fil == col ... % Cuadrada
         && isequal(A, A')) % Simétrica
-
-        disp('Error: Matriz de adyacencia no válida');
-        res = -1;
-        return
+        error('Error: Matriz de adyacencia no válida');
     end
     
     % De manera arbitraria elegimos el primer nodo para comenzar a explorar
@@ -188,7 +235,25 @@ function res = esConexo(A)
     % Si desde cualquier nodo alcanzamos el resto, el grafo es conexo
     res = all(visitados);
 end
-
+% dfs
+% La función dfs() permite explorar un grafo. Recibe como entradas la matriz 
+% de adyacencia del grafo que se quiere estudiar, el punto desde el que empezar 
+% la exploración, objetivo que sirve para detener la exploración al encontrarlo 
+% y opcionalmente el vector que guarda la información de que nodos ya han sido 
+% visitados . Como salida devuelve por un lado, un valor booleano que indica si 
+% el nodo objetivo pertenece a la misma componente conexa que el nodo actual y 
+% por otro lado los nodos que han sido visitados. El algoritmo en el que se basa 
+% es el deep first search, consiste en observar cuales son los vecinos al nodo 
+% actual e ir eliminando aristas según se va avanzando dentro del grafo.
+% 
+% Notas: 
+%% 
+% * Si no se especifica el número de visitados se toma como que se han visitado 
+% cero nodos.
+% * Si el objetivo toma valor 0 significa que se explora toda la componente 
+% conexa.
+% * Por simplicidad no se validan variables de entrada (se espera que el resto 
+% de funciones que llaman a esta introduzcan inputs adecuados).
 
 function [pertenece_comp_conexa, visitados] = dfs(grafo, actual, objetivo, visitados)
     % Por defecto no se ha visitado ningún nodo
@@ -207,8 +272,10 @@ function [pertenece_comp_conexa, visitados] = dfs(grafo, actual, objetivo, visit
 
     % A los nodos vecinos les restamos a los vecinos los que ya hemos visitado
     vecinos_no_visitados = find(vecinos - (vecinos & visitados));
-    figure
-    plot(graph(grafo))
+
+    %% Si se quiere dibujar
+    % figure
+    % plot(graph(grafo))
 
     % Si el objetivo toma valor 0 (No hay objetivo)
     % Se recorre toda la componente conexa del nodo actual
@@ -253,52 +320,63 @@ function [pertenece_comp_conexa, visitados] = dfs(grafo, actual, objetivo, visit
         end
     end
 end
+% kruskal
+% La función kruskal() permite convertir un grafo en un árbol de expansión mínima. 
+% Recibe como entradas la matriz de adyacencia del grafo que se quiere estudiar 
+% y su matriz de pesos (algo redundante en enunciado dado que un grafo ponderado 
+% ya especifica los pesos en su matriz de adyacencia). Como salida devuelve uno 
+% de los posibles árboles de expansión mínima. El algoritmo utilizado es el Kruskal 
+% y se basa en ir añadiendo aristas según su peso de manera creciente y evitando 
+% ciclos que puedan formarse (se busca obtener un árbol).
 
 function S = kruskal(A, W)
-
     [fil, col] = size(A);
     % Matriz de adyacencia debe ser:
     if ~(fil == col ... % Cuadrada
         && isequal(A, A')) % Simétrica
-
-        disp('Error: Matriz de adyacencia no válida');
-        S = -1;
-        return
+        error('Error: Matriz de adyacencia no válida');
     end
 
     [fil, col] = size(W);
     % Matriz de pesos debe ser:
     if ~(fil == col ... % Cuadrada
         && isequal(W, W')) % Simétrica
-
-        disp('Error: Matriz de pesos no válida');
-        S = -1;
-        return
+        error('Error: Matriz de pesos no válida');
     end
 
-    % Se irán añadiendo aristas a S hasta que el grafo sea conexo
-    % Se evitarán ciclos
+    % Inicializamos un grafo S vacío (su matriz de adyacencia)
     num_nodos = fil;
     S = zeros(num_nodos);
+
+    % Obtenemos los pesos posibles ordenados
     pesos = unique(W(W~=0));
+    pesos = sort(pesos);
+
     % Por ser la matriz simétrica solo necesito trabajar con la mitad
     aux = triu(W);
     for i = 1:length(pesos)
+        % Obtenemos las aristas para el peso(i)
         [fil, col] = find(aux == pesos(i));
-        aristas = [fil; col];
-        for j = 1:length(aristas)
+        aristas = [fil, col];
+
+        % Trataremos de añadir cada arista evitando ciclos
+        for j = 1:size(aristas, 1)
+            arista = aristas(j, :);
             
+            % Se irán añadiendo aristas a S hasta que el grafo sea conexo
+            S(arista(1), arista(2)) = pesos(i);
+            S(arista(2), arista(1)) = pesos(i);
+
+            % Si el grafo es conexo hemos terminado
             if esConexo(S)
                 return
             end
 
-            if perteneceCiclo(S, aristas(j))
-                continue
+            % Si al añadir una arista se crea un ciclo la eliminamos
+            if perteneceCiclo(S, arista)
+                S(arista(1), arista(2)) = 0;
+                S(arista(2), arista(1)) = 0;
             end
-
-            S(aristas(j), flip(aristas(j))) = pesos(i);
-            
         end
     end
-
 end
